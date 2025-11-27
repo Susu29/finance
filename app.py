@@ -105,8 +105,24 @@ def logout():
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
-    """Get stock quote."""
-    return apology("TODO")
+        if request.method == "POST":
+            """Get stock quote."""
+            if not request.form.get("stock"):
+                return apology("must provide stock", 403)
+            stock_data = lookup(request.form.get("stock"))
+            try:
+                stock_data["name"]
+                return render_template("quoted.html", name = stock_data["name"], price = stock_data["price"], symbol = stock_data["symbol"] )
+            except:
+                return apology("Invalid stock", 403)
+
+            
+
+
+
+
+        else:
+            return render_template("quote.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -130,8 +146,7 @@ def register():
             db.execute(
                 "INSERT INTO users (username, hash) VALUES (?, ?)",request.form.get("username"), password_hash
             )
-            return render_template("registered.html", message = request.form.get("username"))
-            #register with name ! 
+            return render_template("registered.html", message = request.form.get("username")) 
         except ValueError:
             return apology("Sorry, username already taken", 403)
 
