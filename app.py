@@ -41,8 +41,36 @@ def index():
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
-    """Buy shares of stock"""
-    return apology("TODO")
+    if request.method == "POST":
+        """Buy shares of stock"""
+        # Check if data is valid
+        if not request.form.get("stock"):
+            return apology("Please enter a stock", 403)
+        if not request.form.get("shares"):
+            return apology("Please enter share amount", 403)
+        shares = int(request.form.get("shares"))
+        if shares <= 0:
+            return apology("Please enter a positive amount of shares", 403)
+        stock_data = lookup(request.form.get("stock"))
+        # Check if stock exist
+        try:
+            stock_data["name"]
+        except:
+            return apology("The stock does not exist", 403)
+        total_price = stock_data["price"] * shares
+        user_cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])[0]['cash']
+        if total_price > user_cash:
+            return apology("Not enough funds", 403)
+        db.execute("UPDATE users SET cash = ? WHERE id = ?", (user_cash - total_price), session["user_id"])
+        db.execute("""INSERT INTO orders (username, type, symbol, shares, total_price, time)
+                VALUES (?, ?, ?, ?, ?, datetime('now'))""", 
+                session["user_id"], "buy", request.form.get("stock") ,request.form.get("shares"), total_price, )
+        return apology("Buying to do, sorryyy", 403)
+        
+        
+        
+    else:
+        return render_template("buy.html")
 
 
 @app.route("/history")
