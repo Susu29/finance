@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+History
+{% endblock %}
+
+
+{% block main %}
+    <h1>Transaction History</h1>
+    <table class="table">
+        <tr>
+            <th>Type</th>
+            <th>Symbol</th>
+            <th>Total Price</th>
+            <th>Shares Amount</th>
+            <th>Date & Time</th>
+        </tr>
+        {% for line in user_transactions %}
+        <tr>
+            <th>{{line["type"]}}</th>
+            <th>{{line["symbol"]}}</th>
+            <th>{{line["total_price"]}}</th>
+            <th>{{line["shares"]}}</th>
+            <th>{{line["time"]}}</th>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}  

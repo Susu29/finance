@@ -62,7 +62,7 @@ def buy():
         if total_price > user_cash:
             return apology("Not enough funds", 403)
         db.execute("UPDATE users SET cash = ? WHERE id = ?", (user_cash - total_price), session["user_id"])
-        db.execute("""INSERT INTO orders (username, type, symbol, shares, total_price, time)
+        db.execute("""INSERT INTO orders (user_id, type, symbol, shares, total_price, time)
                 VALUES (?, ?, ?, ?, ?, datetime('now'))""", 
                 session["user_id"], "buy", request.form.get("symbol") ,request.form.get("shares"), total_price)
         return render_template("success.html")
@@ -77,7 +77,9 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    return apology("TODO")
+    user_transactions = db.execute("SELECT * FROM orders WHERE user_id = ?", session["user_id"])
+    print(user_transactions)
+    return render_template("history.html", user_transactions = user_transactions)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -189,7 +191,7 @@ def sell():
         if shares <= 0:
             return apology("Please enter a positive amount of shares", 403)
         ### CHECK IF USER OWN STOCK. AND IS EQUAL OR > OF THE SELL VALUE
-        user_shares = db.execute("SELECT SUM(shares) AS total_shares FROM orders WHERE symbol = ? AND username = ?", request.form.get("symbol"),session["user_id"])[0]['total_shares']
+        user_shares = db.execute("SELECT SUM(shares) AS total_shares FROM orders WHERE symbol = ? AND user_id = ?", request.form.get("symbol"),session["user_id"])[0]['total_shares']
         if shares > user_shares:
             return apology("You don't own enough shares to sell", 403)
         ### ADD MONEY TO USER
@@ -197,7 +199,7 @@ def sell():
         total_price = shares * stock_data["price"]
         db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", total_price, session["user_id"])
         ### ADD TRANSACTION
-        db.execute("""INSERT INTO orders (username, type, symbol, shares, total_price, time)
+        db.execute("""INSERT INTO orders (user_id, type, symbol, shares, total_price, time)
                 VALUES (?, ?, ?, ?, ?, datetime('now'))""", 
                 session["user_id"], "sell", request.form.get("symbol") ,-int(request.form.get("shares")), total_price)
         return render_template("success.html")

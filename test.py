@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 db = SQL("sqlite:///finance.db")
 
-print(db.execute("SELECT cash FROM users WHERE username = ?", 123))
-print(db.execute("SELECT username FROM users"))
-
-db.execute("UPDATE users SET cash = cash + ? WHERE username = ?", 500, 123)
+user_transactions = db.execute("SELECT * FROM orders WHERE user_id = 1")
+for transaction in user_transactions:
+    print(transaction["type"])
+    
