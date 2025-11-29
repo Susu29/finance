@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Stocks owned
+{% endblock %}
+
+
+{% block main %}
+    <h1>Stocks Owned</h1>
+    <table class="table">
+        <tr>
+            <th>Type</th>
+            <th>Symbol</th>
+            <th>Share Value</th>
+            <th>Total Value</th>
+        </tr>
+        {% for line in user_transactions %}
+        <tr>
+            <th>{{line["symbol"]}}</th>
+            <th>{{line["shares"]}}</th>
+            <th>{{line["actual_value"] | usd }}</th>
+            <th>{{line["actual_total_value"] | usd}}</th>
+        </tr>
+        {% endfor %}
+        <tr>
+            <th></th>
+            <th></th>
+            <th>Cash</th>
+            <th>{{actual_money | usd}}</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>TOTAL</th>
+            <th>{{total_value | usd}}</th>
+        </tr>
+    </table>
+
+{% endblock %}  

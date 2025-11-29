@@ -11,13 +11,3 @@ db.execute(
     """INSERT INTO orders (username, type, symbol, shares, total_price, time)
     VALUES (?, ?, ?, ?, ?, ?)""", session["user_id"], "buy", request.form.get("stock") ,request.form.get("shares"), total_price, datetime('now')
 )
-
-# I need to add another table. I want to track portfolio.
-# Would be like this : UserID, Stock, Amount
-# Or i can use +/- with stock when buying
-# So i can SELECT SUM STOCK where ID = USER
-# IF NOT reject
-# IF yes add transaction
-# I think i'm going to add transaction.
-
-## OK so dont' touch anithing to buy :))))

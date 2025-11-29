@@ -35,7 +35,19 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return apology("TODO")
+    user_transactions = db.execute("SELECT symbol, shares FROM orders WHERE user_id = ? GROUP by symbol", session["user_id"])
+    # For each shares above : 
+    # Fetch Price
+    all_shares_value = 0
+    for line in user_transactions:
+        # Fetch Price
+        line["actual_value"] = round(lookup(line["symbol"])["price"],2) #Adding new value to the dict based on a query of the symbol using the return price of lookup
+        # Multiply
+        line["actual_total_value"] = round(line["actual_value"] * line["shares"], 2)
+        all_shares_value += line["actual_total_value"]
+    actual_money = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])[0]["cash"]
+    total_value = actual_money + all_shares_value
+    return render_template("index.html", user_transactions = user_transactions, actual_money = actual_money, total_value = total_value, all_shares_value = all_shares_value)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -57,7 +69,7 @@ def buy():
             stock_data["name"]
         except:
             return apology("The stock does not exist", 403)
-        total_price = stock_data["price"] * shares
+        total_price = round(stock_data["price"] * shares, 2)
         user_cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])[0]['cash']
         if total_price > user_cash:
             return apology("Not enough funds", 403)
@@ -175,7 +187,6 @@ def register():
             return render_template("registered.html", message = request.form.get("username")) 
         except ValueError:
             return apology("Sorry, username already taken", 403)
-
     else:
         return render_template("register.html")
 
@@ -196,7 +207,7 @@ def sell():
             return apology("You don't own enough shares to sell", 403)
         ### ADD MONEY TO USER
         stock_data = lookup(request.form.get("symbol"))
-        total_price = shares * stock_data["price"]
+        total_price = round(shares * stock_data["price"],2)
         db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", total_price, session["user_id"])
         ### ADD TRANSACTION
         db.execute("""INSERT INTO orders (user_id, type, symbol, shares, total_price, time)
@@ -207,6 +218,29 @@ def sell():
         symbol_list = db.execute("SELECT DISTINCT symbol FROM orders ORDER BY symbol")
         symbol_list = [symbol["symbol"] for symbol in symbol_list]
         return render_template("sell.html", message = symbol_list)
+
+
+@app.route("/change_password", methods =["GET","POST"])
+@login_required
+def change_password():
+    """Change password"""
+
+    if request.method == "POST":
+        old_password = request.form.get("old_password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+        print(old_password)
+        print(new_password)
+        # Compare old / new
+        if not check_password_hash(db.execute("SELECT hash FROM users WHERE id = ?", session["user_id"])[0]["hash"], old_password):
+            return apology("Current password does not match", 403)
+        if new_password != confirm_password:
+            return apology("New password does not match the confirmation", 403)
+        db.execute("UPDATE users SET hash = ? WHERE id = ?", generate_password_hash(new_password),session["user_id"])
+        return render_template("/success.html")
+    
+    else:
+        return render_template("change_password.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
