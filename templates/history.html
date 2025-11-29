@@ -19,11 +19,11 @@ History
         <tr>
             <th>{{line["type"]}}</th>
             <th>{{line["symbol"]}}</th>
-            <th>{{line["total_price"]}}</th>
+            <th>{{line["total_price"] | usd}}</th>
             <th>{{line["shares"]}}</th>
             <th>{{line["time"]}}</th>
         </tr>
         {% endfor %}
     </table>
 
-{% endblock %}  
+{% endblock %}

@@ -9,5 +9,12 @@ from helpers import apology, login_required, lookup, usd
 
 db = SQL("sqlite:///finance.db")
 
-test = db.execute("SELECT hash FROM users WHERE id = 1")[0]["hash"]
-print(test)
+test0 = db.execute("SELECT SUM(shares) AS total_shares FROM orders WHERE symbol = 'AAPL' AND user_id = 1")
+
+test1 = db.execute("SELECT SUM(shares) AS total_shares FROM orders WHERE symbol = 'AAPL' AND user_id = 1")[0]['total_shares']
+test2 = db.execute("SELECT shares AS total_shares FROM orders WHERE symbol = 'AAPL' AND user_id = 1")
+
+print(test0)
+print(test1)
+print(test2)
+

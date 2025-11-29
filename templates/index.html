@@ -9,31 +9,31 @@ Stocks owned
     <h1>Stocks Owned</h1>
     <table class="table">
         <tr>
-            <th>Type</th>
             <th>Symbol</th>
+            <th>Share amount</th>
             <th>Share Value</th>
             <th>Total Value</th>
         </tr>
         {% for line in user_transactions %}
         <tr>
-            <th>{{line["symbol"]}}</th>
-            <th>{{line["shares"]}}</th>
-            <th>{{line["actual_value"] | usd }}</th>
-            <th>{{line["actual_total_value"] | usd}}</th>
+            <td>{{line["symbol"]}}</td>
+            <td>{{line["total_shares"]}}</td>
+            <td>{{line["actual_value"] | usd }}</td>
+            <td>{{line["actual_total_value"] | usd}}</td>
         </tr>
         {% endfor %}
         <tr>
-            <th></th>
-            <th></th>
-            <th>Cash</th>
-            <th>{{actual_money | usd}}</th>
+            <td></td>
+            <td></td>
+            <td>Cash</td>
+            <td>{{actual_money | usd }}</td>
         </tr>
         <tr>
-            <th></th>
-            <th></th>
-            <th>TOTAL</th>
-            <th>{{total_value | usd}}</th>
+            <td></td>
+            <td></td>
+            <td>TOTAL</td>
+            <td>{{total_value | usd }}</td>
         </tr>
     </table>
 
-{% endblock %}  
+{% endblock %}

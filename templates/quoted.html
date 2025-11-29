@@ -7,6 +7,6 @@ Quoted
 
 {% block main %}
     <h1>Stock : {{name}}</h1>
-    <h1>Price : {{price}}</h1>
+    <h1>Price : {{price | usd}}</h1>
     <h1>Currency : {{symbol}}</h1>
-{% endblock %}  
+{% endblock %}
